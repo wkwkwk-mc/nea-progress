@@ -7,7 +7,7 @@ COPY . .
 RUN npm run build
 
 # Step 2: Build PHP/Apache Environment
-FROM php:8.2-apache
+FROM php:8.4-apache
 
 # Install required system packages (Database packages removed)
 RUN apt-get update && apt-get install -y \
