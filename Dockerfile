@@ -9,7 +9,7 @@ RUN npm run build
 # Step 2: Build PHP/Apache Environment
 FROM php:8.4-apache
 
-# Install required system packages (Database packages removed)
+# Install required system packages for Laravel & Zip support
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
@@ -38,8 +38,11 @@ COPY --from=frontend /app/public/build ./public/build
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
-# Set proper directory permissions for Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Create database directory, SQLite file, and set permissions for www-data
+RUN mkdir -p /var/www/html/database && \
+    touch /var/www/html/database/database.sqlite && \
+    chown -R www-data:www-data /var/www/html/storage /var/www/html/database /var/www/html/bootstrap/cache && \
+    chmod -R 775 /var/www/html/storage /var/www/html/database /var/www/html/bootstrap/cache
 
 # Setup start script
 COPY start.sh /usr/local/bin/start.sh
